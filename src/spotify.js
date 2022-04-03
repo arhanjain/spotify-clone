@@ -11,4 +11,16 @@ const scopes = [
   "user-read-playback-state",
   "user-top-read",
   "user-modify-playback-state",
-]
+];
+
+export const getTokenFromURL = () => {
+  return window.location.hash.substring(1).split('&')
+  .reduce((previous, item) => {
+    var parts = item.split('=');
+    previous[parts[0]] = decodeURIComponent(parts[1]);
+
+    return previous;
+  }, {});
+}
+
+export const loginURL = `${authEndpoint}?client_id=${clientID}&redirect_uri=${redirectURI}&scope=${scopes.join("%20")}&response_type=token&show_dialog=true`;
