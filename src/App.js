@@ -19,7 +19,10 @@ function App() {
     const _token = hash.access_token;;
     
     if (_token) {
-      setToken(_token);
+      dispatch({
+        type: 'SET_TOKEN',
+        token: _token,
+      });
 
       spotify.setAccessToken(_token);
       spotify.getMe().then((user) => {
@@ -32,7 +35,6 @@ function App() {
 
   }, []);
 
-  console.log("hehe", user);
 
   return (
     <div className="app">
