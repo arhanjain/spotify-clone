@@ -4,6 +4,7 @@ const SpotifyWebApi = require('spotify-web-api-node');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const lyricsFinder = require('lyrics-finder')
+const axios = require('axios')
 
 const app = express();
 app.use(cors());
@@ -57,6 +58,33 @@ app.post('/login', (req, res) => {
 app.get('/lyrics', async(req, res) => {
   const lyrics = await lyricsFinder(req.query.artist, req.query.track) || "No Lyrics Found"
   res.json({lyrics})
+});
+app.post('/translate', (req, res) => {
+  const lyricsToTranslate = req.body.lyrics.substring(0,50)
+  const options = {
+    method: 'GET',
+    url: 'https://translated-mymemory---translation-memory.p.rapidapi.com/api/get',
+    params: {
+      langpair: 'ja|en',
+      q: lyricsToTranslate,
+      mt: '1',
+      onlyprivate: '0',
+      de: 'epicarhan@gmail.com',
+    },
+    headers: {
+      'X-RapidAPI-Host': process.env.X_RAPIDAPI_HOST,
+      'X-RapidAPI-Key': process.env.X_RAPIDAPI_KEY,
+    }
+  }
+  axios.request(options).then(data => {
+    res.json({
+      translation: data.data.responseData.translatedText
+    })
+  })
+  // const len = req.body.lyrics.length
+  // res.json({
+  //   translation: len,
+  // })
 })
 
 

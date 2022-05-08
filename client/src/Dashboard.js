@@ -6,6 +6,8 @@ import SpotifyWebApi from 'spotify-web-api-node'
 import TrackSearchResult from './TrackSearchResult'
 import Player from './Player'
 import axios from 'axios'
+import { Grid, Paper } from '@mui/material'
+import Button from '@mui/material/Button'
 
 const spotifyApi = new SpotifyWebApi({
   clientId: '518af3e8c49f4e5f97594f7d3f4f58ac',
@@ -17,12 +19,24 @@ export default function Dashboard({ code }) {
   const [searchResults, setSearchResults] = useState([])
   const [playingTrack, setPlayingTrack] = useState()
   const [lyrics, setLyrics] = useState("")
+  const [translation, setTranslation] = useState("")
   const accessToken = useAuth(code)
 
   function chooseTrack(track) {
     setPlayingTrack(track)
     setSearch("")
     setLyrics("")
+  }
+
+  function translateLyrics(lyrics) {
+    if(!lyrics) return
+
+    console.log("I AM")
+    axios.post('http://localhost:3001/translate', {
+      lyrics,
+    }).then(res => {
+      setTranslation(res.data.translation)
+    })
   }
 
   useEffect(() => {
@@ -82,11 +96,21 @@ export default function Dashboard({ code }) {
       <TrackSearchResult track={track} key={track.uri}  chooseTrack={chooseTrack} />
       ))}
       {searchResults.length === 0 && (
-        <div className="text-center" style={{whiteSpace: "pre"}}>
-          {lyrics}
-        </div>
+        <Grid container columns={12} spacing={0.5}>
+          <Grid item xs={6}>
+            <Paper elevation={2}>
+              {lyrics}
+            </Paper>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper elevation={2}>
+              {translation}
+            </Paper>
+          </Grid>
+        </Grid>
       )}
     </div>
+    <Button variant='contained' onClick={() => translateLyrics(lyrics)}>Translate</Button>
     <div>
       <Player accessToken={accessToken} trackUri={playingTrack?.uri}/>
     </div>
